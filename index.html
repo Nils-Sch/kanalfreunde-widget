@@ -55,6 +55,9 @@
       const tabName = 'Antworten';
       const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${tabName}`;
 
+      // Begriffe, die ausgefiltert werden sollen
+      const blacklist = /(arsch|fuck|shit|schei\u00dfe|hurensohn|spam|http|https|www\.|porn|nazi|hitler|drittes reich|heil|ss|afd|gauland|weidel|rechter|hakenkreuz|juden|judenhass|judenfrage|lügenpresse|ausländer raus|volksverräter|kanacken|abschaum|nazischwein|rassist|rassismus|rechtsruck|blm ist mist|klimawandel lüge|umvolkung)/i;
+
       try {
         const res = await fetch(url);
         const text = await res.text();
@@ -67,7 +70,7 @@
             name: r.c[1] && r.c[1].v ? r.c[1].v : '',
             kommentar: r.c[2] && r.c[2].v ? r.c[2].v : ''
           };
-        }).filter(e => e.datum && e.kommentar);
+        }).filter(e => e.datum && e.kommentar && !blacklist.test(e.kommentar));
 
         const container = document.getElementById('kommentarliste');
         container.innerHTML = '';
