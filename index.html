@@ -28,24 +28,9 @@
     .text {
       margin-top: 0.4em;
     }
-    .zurueck-button {
-      display: inline-block;
-      margin-bottom: 1.5em;
-      padding: 10px 20px;
-      background-color: #007BFF;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-    .zurueck-button:hover {
-      background-color: #0056b3;
-    }
   </style>
 </head>
 <body>
-  <a class="zurueck-button" href="https://docs.google.com/forms/d/1ch3k9s3fqqFZHy86MhPd7_VvVwrCjIv3gbdTAOkXaQk/viewform" target="_blank">➕ Kommentar abgeben</a>
-
   <h2>💬 Letzte Kommentare</h2>
   <div id="kommentarliste">Lade Kommentare...</div>
 
@@ -55,8 +40,8 @@
       const tabName = 'Antworten';
       const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${tabName}`;
 
-      // Begriffe, die ausgefiltert werden sollen
-      const blacklist = /(arsch|fuck|shit|schei\u00dfe|hurensohn|spam|http|https|www\.|porn|nazi|hitler|drittes reich|heil|ss|afd|gauland|weidel|rechter|hakenkreuz|juden|judenhass|judenfrage|lügenpresse|ausländer raus|volksverräter|kanacken|abschaum|nazischwein|rassist|rassismus|rechtsruck|blm ist mist|klimawandel lüge|umvolkung)/i;
+      // Begriffe filtern (ausgebauter Hardcoded-Filter)
+      const blacklist = /(arsch|fuck|shit|schei\u00dfe|hurensohn|spam|http|https|porn|nazi|hitler|drittes reich|heil|ss|afd|gauland|weidel|rechter|hakenkreuz|juden|judenhass|lügenpresse|ausländer raus|volksverräter|kanacken|abschaum|nazischwein|rassist|rassismus|höcke|hoecke)/i;
 
       try {
         const res = await fetch(url);
@@ -70,10 +55,16 @@
             name: r.c[1] && r.c[1].v ? r.c[1].v : '',
             kommentar: r.c[2] && r.c[2].v ? r.c[2].v : ''
           };
-        }).filter(e => e.datum && e.kommentar && !blacklist.test(e.kommentar));
+        }).filter(e => e.datum && e.kommentar && e.name && !blacklist.test(`${e.name} ${e.kommentar}`));
 
         const container = document.getElementById('kommentarliste');
         container.innerHTML = '';
+
+        if (eintraege.length === 0) {
+          container.innerHTML = '<p>Es sind keine öffentlichen Kommentare vorhanden.</p>';
+          return;
+        }
+
         eintraege.slice(0, 10).forEach(e => {
           const kommentarDiv = document.createElement('div');
           kommentarDiv.className = 'kommentar';
@@ -90,9 +81,7 @@
     }
 
     ladeKommentare();
-    setInterval(() => {
-      ladeKommentare();
-    }, 15000); // Aktualisiere alle 15 Sekunden
+    setInterval(() => ladeKommentare(), 15000);
   </script>
 </body>
 </html>
