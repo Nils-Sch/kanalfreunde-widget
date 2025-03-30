@@ -28,9 +28,24 @@
     .text {
       margin-top: 0.4em;
     }
+    .zurueck-button {
+      display: inline-block;
+      margin-bottom: 1.5em;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .zurueck-button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
+  <a class="zurueck-button" href="https://docs.google.com/forms/d/1ch3k9s3fqqFZHy86MhPd7_VvVwrCjIv3gbdTAOkXaQk/viewform" target="_blank">➕ Kommentar abgeben</a>
+
   <h2>💬 Letzte Kommentare</h2>
   <div id="kommentarliste">Lade Kommentare...</div>
 
@@ -72,6 +87,9 @@
     }
 
     ladeKommentare();
+    setInterval(() => {
+      ladeKommentare();
+    }, 15000); // Aktualisiere alle 15 Sekunden
   </script>
 </body>
 </html>
