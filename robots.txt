@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://nils-sch.github.io/kanalfreunde-widget/sitemap.xml
