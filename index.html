@@ -1,2 +1,77 @@
 <!DOCTYPE html>
-<html><body><h1>Testseite ist online 🎉</h1></body></html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Live-Kommentarvorschau</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background: #f5f5f5;
+    }
+    .kommentar {
+      background: #fff;
+      border-left: 4px solid #007BFF;
+      margin-bottom: 1em;
+      padding: 0.5em 1em;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .datum {
+      font-size: 0.9em;
+      color: #666;
+    }
+    .name {
+      font-weight: bold;
+      margin-top: 0.2em;
+    }
+    .text {
+      margin-top: 0.4em;
+    }
+  </style>
+</head>
+<body>
+  <h2>💬 Letzte Kommentare</h2>
+  <div id="kommentarliste">Lade Kommentare...</div>
+
+  <script>
+    async function ladeKommentare() {
+      const sheetID = '1X4Iaui9J6XGjQAskKlBPK1n7MbI0ZfL1o5g4jCghiSQ'; // z.B. 1ch3k9s3fqqFZHy86MhPd7_VvVwrCjIv3gbdTAOkXaQk
+      const tabName = 'Antworten';
+      const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${tabName}`;
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        const jsonData = text.substring(47).slice(0, -2);
+        const json = JSON.parse(jsonData);
+
+        const eintraege = json.table.rows.map(r => {
+          return {
+            datum: r.c[0] && r.c[0].f ? r.c[0].f : '',
+            name: r.c[1] && r.c[1].v ? r.c[1].v : '',
+            kommentar: r.c[2] && r.c[2].v ? r.c[2].v : ''
+          };
+        }).filter(e => e.datum && e.kommentar);
+
+        const container = document.getElementById('kommentarliste');
+        container.innerHTML = '';
+        eintraege.slice(0, 10).forEach(e => {
+          const kommentarDiv = document.createElement('div');
+          kommentarDiv.className = 'kommentar';
+          kommentarDiv.innerHTML = `
+            <div class="datum">🗓️ ${e.datum}</div>
+            <div class="name">👤 ${e.name}</div>
+            <div class="text">“${e.kommentar}”</div>`;
+          container.appendChild(kommentarDiv);
+        });
+      } catch (err) {
+        document.getElementById('kommentarliste').innerText = 'Fehler beim Laden der Kommentare.';
+        console.error('Fehler beim Parsen oder Abrufen der Daten:', err);
+      }
+    }
+
+    ladeKommentare();
+  </script>
+</body>
+</html>
